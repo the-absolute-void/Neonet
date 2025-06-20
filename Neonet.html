@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeonNet - Cyberpunk Hacker Community</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --neon-pink: #ff2a6d;
+            --neon-blue: #05d9e8;
+            --neon-purple: #d300c5;
+            --dark-bg: #0d0221;
+            --darker-bg: #05010e;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+        }
+        
+        .cyberpunk-border {
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue), 
+                        inset 0 0 10px var(--neon-blue);
+        }
+        
+        .cyberpunk-btn {
+            background: transparent;
+            border: 2px solid var(--neon-pink);
+            color: var(--neon-pink);
+            padding: 8px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 5px var(--neon-pink), 
+                       inset 0 0 5px var(--neon-pink);
+        }
+        
+        .cyberpunk-btn:hover {
+            background: var(--neon-pink);
+            color: black;
+            box-shadow: 0 0 20px var(--neon-pink);
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 5px var(--neon-blue),
+                         0 0 10px var(--neon-blue),
+                         0 0 15px var(--neon-blue);
+        }
+        
+        .pink-text {
+            color: var(--neon-pink);
+        }
+        
+        .blue-text {
+            color: var(--neon-blue);
+        }
+        
+        .purple-text {
+            color: var(--neon-purple);
+        }
+        
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--neon-purple);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--neon-blue);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(31px, 9999px, 94px, 0); }
+            10% { clip: rect(112px, 9999px, 76px, 0); }
+            20% { clip: rect(85px, 9999px, 77px, 0); }
+            30% { clip: rect(27px, 9999px, 97px, 0); }
+            40% { clip: rect(64px, 9999px, 98px, 0); }
+            50% { clip: rect(61px, 9999px, 85px, 0); }
+            60% { clip: rect(99px, 9999px, 114px, 0); }
+            70% { clip: rect(34px, 9999px, 115px, 0); }
+            80% { clip: rect(98px, 9999px, 129px, 0); }
+            90% { clip: rect(43px, 9999px, 96px, 0); }
+            100% { clip: rect(82px, 9999px, 64px, 0); }
+        }
+        
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 119px, 0); }
+            10% { clip: rect(144px, 9999px, 41px, 0); }
+            20% { clip: rect(6px, 9999px, 101px, 0); }
+            30% { clip: rect(148px, 9999px, 99px, 0); }
+            40% { clip: rect(121px, 9999px, 149px, 0); }
+            50% { clip: rect(66px, 9999px, 102px, 0); }
+            60% { clip: rect(115px, 9999px, 74px, 0); }
+            70% { clip: rect(113px, 9999px, 61px, 0); }
+            80% { clip: rect(38px, 9999px, 84px, 0); }
+            90% { clip: rect(83px, 9999px, 135px, 0); }
+            100% { clip: rect(73px, 9999px, 14px, 0); }
+        }
+        
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.03) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .terminal-text {
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid var(--neon-blue);
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--neon-blue) }
+        }
+        
+        .message {
+            animation: messageAppear 0.3s ease-out;
+        }
+        
+        @keyframes messageAppear {
+            from { 
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .tab {
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--neon-pink);
+            color: var(--neon-pink);
+        }
+        
+        .tab:hover:not(.active) {
+            border-bottom: 3px solid var(--neon-blue);
+            color: var(--neon-blue);
+        }
+        
+        .post {
+            border-left: 3px solid var(--neon-purple);
+            transition: all 0.3s;
+        }
+        
+        .post:hover {
+            border-left: 5px solid var(--neon-blue);
+            box-shadow: 0 0 10px rgba(5, 217, 232, 0.3);
+        }
+        
+        .user-avatar {
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 5px var(--neon-blue);
+        }
+        
+        .online-dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--neon-pink);
+            border-radius: 50%;
+            box-shadow: 0 0 5px var(--neon-pink);
+        }
+        
+        .chat-message.self {
+            background: rgba(255, 42, 109, 0.1);
+            border-left: 3px solid var(--neon-pink);
+        }
+        
+        .chat-message.other {
+            background: rgba(5, 217, 232, 0.1);
+            border-left: 3px solid var(--neon-blue);
+        }
+        
+        #chat-container {
+            height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--neon-purple) var(--darker-bg);
+        }
+        
+        #chat-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        #chat-container::-webkit-scrollbar-track {
+            background: var(--darker-bg);
+        }
+        
+        #chat-container::-webkit-scrollbar-thumb {
+            background-color: var(--neon-purple);
+            border-radius: 10px;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Scanlines effect -->
+    <div class="scanlines"></div>
+    
+    <!-- Main container -->
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8 cyberpunk-border p-4">
+            <div class="flex items-center">
+                <h1 class="text-3xl font-bold neon-text glitch" data-text="NeonNet">NeonNet</h1>
+                <span class="ml-2 text-xs pink-text">v2.4.7</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <div class="absolute -top-1 -right-1 online-dot"></div>
+                    <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=cyber" alt="User Avatar" class="w-10 h-10 rounded-full user-avatar">
+                </div>
+                <div>
+                    <div class="text-sm blue-text">USER_0x7A3F</div>
+                    <div class="text-xs purple-text">ELITE HACKER</div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Navigation tabs -->
+        <div class="flex border-b border-neon-blue mb-6">
+            <button id="feed-tab" class="tab px-4 py-2 font-bold active">HACKER FEED</button>
+            <button id="chat-tab" class="tab px-4 py-2 font-bold">SECURE CHAT</button>
+            <button id="tools-tab" class="tab px-4 py-2 font-bold">CYBER TOOLS</button>
+            <button id="market-tab" class="tab px-4 py-2 font-bold">BLACK MARKET</button>
+        </div>
+        
+        <!-- Main content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left sidebar - User profile and stats -->
+            <div class="lg:col-span-1 cyberpunk-border p-4 hidden lg:block">
+                <div class="flex flex-col items-center mb-6">
+                    <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=cyber" alt="User Avatar" class="w-24 h-24 rounded-full user-avatar mb-3">
+                    <h3 class="text-xl font-bold pink-text">USER_0x7A3F</h3>
+                    <p class="text-sm blue-text mb-2">ELITE HACKER</p>
+                    <div class="flex space-x-4 text-xs mb-4">
+                        <div>
+                            <div class="font-bold purple-text">REP</div>
+                            <div>4,827</div>
+                        </div>
+                        <div>
+                            <div class="font-bold purple-text">SKILL</div>
+                            <div>98%</div>
+                        </div>
+                        <div>
+                            <div class="font-bold purple-text">OPS</div>
+                            <div>247</div>
+                        </div>
+                    </div>
+                    <button class="cyberpunk-btn text-xs">UPGRADE</button>
+                </div>
+                
+                <div class="mb-6">
+                    <h4 class="text-lg font-bold blue-text mb-2">ONLINE NOW</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <div class="relative mr-3">
+                                <div class="absolute -top-1 -right-1 online-dot"></div>
+                                <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=anon1" alt="User" class="w-8 h-8 rounded-full user-avatar">
+                            </div>
+                            <div>
+                                <div class="text-sm">ANON_0x1F2E</div>
+                                <div class="text-xs text-gray-400">PENTESTER</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="relative mr-3">
+                                <div class="absolute -top-1 -right-1 online-dot"></div>
+                                <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=anon2" alt="User" class="w-8 h-8 rounded-full user-avatar">
+                            </div>
+                            <div>
+                                <div class="text-sm">CRYPTO_0x9B4C</div>
+                                <div class="text-xs text-gray-400">CRYPTOANARCHIST</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="relative mr-3">
+                                <div class="absolute -top-1 -right-1 online-dot"></div>
+                                <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=anon3" alt="User" class="w-8 h-8 rounded-full user-avatar">
+                            </div>
+                            <div>
+                                <div class="text-sm">PHANTOM_0x5D6A</div>
+                                <div class="text-xs text-gray-400">GHOST HACKER</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold blue-text mb-2">TRENDING TAGS</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 text-xs bg-purple-900 text-purple-300 rounded">#zeroday</span>
+                        <span class="px-2 py-1 text-xs bg-blue-900 text-blue-300 rounded">#infosec</span>
+                        <span class="px-2 py-1 text-xs bg-pink-900 text-pink-300 rounded">#darkweb</span>
+                        <span class="px-2 py-1 text-xs bg-purple-900 text-purple-300 rounded">#cryptolock</span>
+                        <span class="px-2 py-1 text-xs bg-blue-900 text-blue-300 rounded">#phishing</span>
+                        <span class="px-2 py-1 text-xs bg-pink-900 text-pink-300 rounded">#malware</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main feed/chat area -->
+            <div class="lg:col-span-2">
+                <!-- Feed content (default visible) -->
+                <div id="feed-content">
+                    <!-- Post composer -->
+                    <div class="cyberpunk-border p-4 mb-6">
+                        <textarea id="post-content" class="w-full bg-black text-white p-3 mb-3 border border-neon-blue focus:outline-none focus:ring-2 focus:ring-neon-blue" rows="3" placeholder="SHARE YOUR HACKS..."></textarea>
+                        <div class="flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <button class="cyberpunk-btn text-xs">ADD CODE</button>
+                                <button class="cyberpunk-btn text-xs">UPLOAD</button>
+                                <button class="cyberpunk-btn text-xs">ANONYMOUS</button>
+                            </div>
+                            <button id="post-submit" class="cyberpunk-btn text-xs">POST</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Feed posts -->
+                    <div id="posts-container" class="space-y-6">
+                        <!-- Sample post 1 -->
+                        <div class="cyberpunk-border p-4 post">
+                            <div class="flex items-center mb-3">
+                                <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=anon1" alt="User" class="w-10 h-10 rounded-full user-avatar mr-3">
+                                <div>
+                                    <div class="font-bold pink-text">ANON_0x1F2E</div>
+                                    <div class="text-xs text-gray-400">2.3 HOURS AGO</div>
+                                </div>
+                            </div>
+                            <p class="mb-3">Just discovered a zero-day in ████████ CMS. Patch incoming in 24h. DM for details. #zeroday #infosec</p>
+                            <div class="flex space-x-4 text-xs">
+                                <button class="flex items-center text-neon-blue">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                                    </svg>
+                                    42
+                                </button>
+                                <button class="flex items-center text-neon-purple">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                    13
+                                </button>
+                                <button class="flex items-center text-neon-pink">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                    </svg>
+                                    SAVE
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Sample post 2 -->
+                        <div class="cyberpunk-border p-4 post">
+                            <div class="flex items-center mb-3">
+                                <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=anon2" alt="User" class="w-10 h-10 rounded-full user-avatar mr-3">
+                                <div>
+                                    <div class="font-bold pink-text">CRYPTO_0x9B4C</div>
+                                    <div class="text-xs text-gray-400">5.7 HOURS AGO</div>
+                                </div>
+                            </div>
+                            <p class="mb-3">New blockchain exploit allows for double-spending in ████████ network. Patch already deployed but many nodes still vulnerable. #blockchain #exploit</p>
+                            <div class="bg-black p-3 mb-3 overflow-x-auto">
+                                <code class="text-green-400 text-sm">
+                                    function exploit() {<br>
+                                    &nbsp;&nbsp;let vuln = findVulnerability();<br>
+                                    &nbsp;&nbsp;while(!txConfirmed) {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;doubleSpend(vuln);<br>
+                                    &nbsp;&nbsp;}<br>
+                                    }
+                                </code>
+                            </div>
+                            <div class="flex space-x-4 text-xs">
+                                <button class="flex items-center text-neon-blue">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                                    </svg>
+                                    87
+                                </button>
+                                <button class="flex items-center text-neon-purple">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                    29
+                                </button>
+                                <button class="flex items-center text-neon-pink">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                    </svg>
+                                    SAVE
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Sample post 3 -->
+                        <div class="cyberpunk-border p-4 post">
+                            <div class="flex items-center mb-3">
+                                <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=anon3" alt="User" class="w-10 h-10 rounded-full user-avatar mr-3">
+                                <div>
+                                    <div class="font-bold pink-text">PHANTOM_0x5D6A</div>
+                                    <div class="text-xs text-gray-400">1.1 DAYS AGO</div>
+                                </div>
+                            </div>
+                            <p class="mb-3">New phishing kit with 97% success rate. Comes with automated ████████ bypass. Contact for demo. #phishing #malware</p>
+                            <div class="flex space-x-4 text-xs">
+                                <button class="flex items-center text-neon-blue">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                                    </svg>
+                                    134
+                                </button>
+                                <button class="flex items-center text-neon-purple">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                    47
+                                </button>
+                                <button class="flex items-center text-neon-pink">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                    </svg>
+                                    SAVE
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chat content (hidden by default) -->
+                <div id="chat-content" class="hidden">
+                    <div class="cyberpunk-border p-4 mb-4">
+                        <div class="flex items-center mb-3">
+                            <div class="relative mr-3">
+                                <div class="absolute -top-1 -right-1 online-dot"></div>
+                                <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=anon1" alt="User" class="w-10 h-10 rounded-full user-avatar">
+                            </div>
+                            <div>
+                                <div class="font-bold pink-text">ANON_0x1F2E</div>
+                                <div class="text-xs text-gray-400">PENTESTER</div>
+                            </div>
+                        </div>
+                        
+                        <div id="chat-container" class="mb-4">
+                            <!-- Chat messages will go here -->
+                            <div class="chat-message other mb-3 p-3 rounded">
+                                <div class="text-xs text-gray-400 mb-1">ANON_0x1F2E • 2:14 PM</div>
+                                <p>Hey, got that exploit you wanted. Check your secure drop.</p>
+                            </div>
+                            <div class="chat-message self mb-3 p-3 rounded">
+                                <div class="text-xs text-gray-400 mb-1">YOU • 2:15 PM</div>
+                                <p>Thanks. Payment sent to your ████████ wallet.</p>
+                            </div>
+                            <div class="chat-message other mb-3 p-3 rounded">
+                                <div class="text-xs text-gray-400 mb-1">ANON_0x1F2E • 2:16 PM</div>
+                                <p>Confirmed. Here's the decryption key: ██████████████████</p>
+                            </div>
+                            <div class="chat-message self mb-3 p-3 rounded">
+                                <div class="text-xs text-gray-400 mb-1">YOU • 2:17 PM</div>
+                                <p>Works perfectly. Let me know when you find more.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <input type="text" id="chat-input" class="flex-grow bg-black text-white p-2 border border-neon-blue focus:outline-none focus:ring-2 focus:ring-neon-blue" placeholder="TYPE ENCRYPTED MESSAGE...">
+                            <button id="chat-send" class="cyberpunk-btn ml-2">SEND</button>
+                        </div>
+                    </div>
+                    
+                    <div class="cyberpunk-border p-4">
+                        <h3 class="text-lg font-bold blue-text mb-3">ACTIVE CHANNELS</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-2 hover:bg-gray-900 cursor-pointer">
+                                <div class="flex items-center">
+                                    <div class="relative mr-3">
+                                        <div class="absolute -top-1 -right-1 online-dot"></div>
+                                        <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=anon1" alt="User" class="w-8 h-8 rounded-full user-avatar">
+                                    </div>
+                                    <div>
+                                        <div class="text-sm">ANON_0x1F2E</div>
+                                        <div class="text-xs text-gray-400">PENTESTER</div>
+                                    </div>
+                                </div>
+                                <span class="text-xs bg-neon-blue text-black px-2 py-1 rounded-full">3</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 hover:bg-gray-900 cursor-pointer">
+                                <div class="flex items-center">
+                                    <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=anon2" alt="User" class="w-8 h-8 rounded-full user-avatar mr-3">
+                                    <div>
+                                        <div class="text-sm">CRYPTO_0x9B4C</div>
+                                        <div class="text-xs text-gray-400">CRYPTOANARCHIST</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-2 hover:bg-gray-900 cursor-pointer">
+                                <div class="flex items-center">
+                                    <div class="relative mr-3">
+                                        <div class="absolute -top-1 -right-1 online-dot pulse"></div>
+                                        <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=anon3" alt="User" class="w-8 h-8 rounded-full user-avatar">
+                                    </div>
+                                    <div>
+                                        <div class="text-sm">PHANTOM_0x5D6A</div>
+                                        <div class="text-xs text-gray-400">GHOST HACKER</div>
+                                    </div>
+                                </div>
+                                <span class="text-xs bg-neon-pink text-black px-2 py-1 rounded-full">1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tools content (hidden by default) -->
+                <div id="tools-content" class="hidden">
+                    <div class="cyberpunk-border p-4 mb-6">
+                        <h2 class="text-2xl font-bold pink-text mb-4">CYBER TOOLS</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="cyberpunk-border p-4 hover:bg-gray-900 cursor-pointer">
+                                <h3 class="text-lg font-bold blue-text mb-2">PORT SCANNER</h3>
+                                <p class="text-sm mb-3">Advanced network scanning utility with stealth capabilities.</p>
+                                <button class="cyberpunk-btn text-xs">LAUNCH</button>
+                            </div>
+                            <div class="cyberpunk-border p-4 hover:bg-gray-900 cursor-pointer">
+                                <h3 class="text-lg font-bold blue-text mb-2">EXPLOIT DB</h3>
+                                <p class="text-sm mb-3">Database of verified exploits and vulnerabilities.</p>
+                                <button class="cyberpunk-btn text-xs">ACCESS</button>
+                            </div>
+                            <div class="cyberpunk-border p-4 hover:bg-gray-900 cursor-pointer">
+                                <h3 class="text-lg font-bold blue-text mb-2">CRYPTO LOCKER</h3>
+                                <p class="text-sm mb-3">Advanced ransomware builder with polymorphic code.</p>
+                                <button class="cyberpunk-btn text-xs">BUILD</button>
+                            </div>
+                            <div class="cyberpunk-border p-4 hover:bg-gray-900 cursor-pointer">
+                                <h3 class="text-lg font-bold blue-text mb-2">DDoS BOTNET</h3>
+                                <p class="text-sm mb-3">Control panel for distributed denial of service attacks.</p>
+                                <button class="cyberpunk-btn text-xs">DEPLOY</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Market content (hidden by default) -->
+                <div id="market-content" class="hidden">
+                    <div class="cyberpunk-border p-4">
+                        <h2 class="text-2xl font-bold pink-text mb-4">BLACK MARKET</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="cyberpunk-border p-4 hover:bg-gray-900">
+                                <h3 class="text-lg font-bold blue-text mb-2">STOLEN CREDS</h3>
+                                <p class="text-sm mb-2">Premium account credentials - 0.05 BTC</p>
+                                <button class="cyberpunk-btn text-xs w-full">PURCHASE</button>
+                            </div>
+                            <div class="cyberpunk-border p-4 hover:bg-gray-900">
+                                <h3 class="text-lg font-bold blue-text mb-2">ZERO-DAY</h3>
+                                <p class="text-sm mb-2">Windows kernel exploit - 2.5 BTC</p>
+                                <button class="cyberpunk-btn text-xs w-full">PURCHASE</button>
+                            </div>
+                            <div class="cyberpunk-border p-4 hover:bg-gray-900">
+                                <h3 class="text-lg font-bold blue-text mb-2">BOTNET</h3>
+                                <p class="text-sm mb-2">10,000 infected devices - 1.2 BTC</p>
+                                <button class="cyberpunk-btn text-xs w-full">PURCHASE</button>
+                            </div>
+                            <div class="cyberpunk-border p-4 hover:bg-gray-900">
+                                <h3 class="text-lg font-bold blue-text mb-2">FAKE ID</h3>
+                                <p class="text-sm mb-2">EU passport + driver's license - 0.8 BTC</p>
+                                <button class="cyberpunk-btn text-xs w-full">PURCHASE</button>
+                            </div>
+                            <div class="cyberpunk-border p-4 hover:bg-gray-900">
+                                <h3 class="text-lg font-bold blue-text mb-2">MALWARE</h3>
+                                <p class="text-sm mb-2">Custom banking trojan - 3.0 BTC</p>
+                                <button class="cyberpunk-btn text-xs w-full">PURCHASE</button>
+                            </div>
+                            <div class="cyberpunk-border p-4 hover:bg-gray-900">
+                                <h3 class="text-lg font-bold blue-text mb-2">DARK WEB HOSTING</h3>
+                                <p class="text-sm mb-2">1 year anonymous hosting - 0.3 BTC</p>
+                                <button class="cyberpunk-btn text-xs w-full">PURCHASE</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab switching functionality
+        document.getElementById('feed-tab').addEventListener('click', function() {
+            document.getElementById('feed-content').classList.remove('hidden');
+            document.getElementById('chat-content').classList.add('hidden');
+            document.getElementById('tools-content').classList.add('hidden');
+            document.getElementById('market-content').classList.add('hidden');
+            
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+        });
+        
+        document.getElementById('chat-tab').addEventListener('click', function() {
+            document.getElementById('feed-content').classList.add('hidden');
+            document.getElementById('chat-content').classList.remove('hidden');
+            document.getElementById('tools-content').classList.add('hidden');
+            document.getElementById('market-content').classList.add('hidden');
+            
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+        });
+        
+        document.getElementById('tools-tab').addEventListener('click', function() {
+            document.getElementById('feed-content').classList.add('hidden');
+            document.getElementById('chat-content').classList.add('hidden');
+            document.getElementById('tools-content').classList.remove('hidden');
+            document.getElementById('market-content').classList.add('hidden');
+            
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+        });
+        
+        document.getElementById('market-tab').addEventListener('click', function() {
+            document.getElementById('feed-content').classList.add('hidden');
+            document.getElementById('chat-content').classList.add('hidden');
+            document.getElementById('tools-content').classList.add('hidden');
+            document.getElementById('market-content').classList.remove('hidden');
+            
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+        });
+        
+        // Chat functionality
+        document.getElementById('chat-send').addEventListener('click', sendMessage);
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                const chatContainer = document.getElementById('chat-container');
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = 'chat-message self mb-3 p-3 rounded';
+                messageElement.innerHTML = `
+                    <div class="text-xs text-gray-400 mb-1">YOU • ${timeString}</div>
+                    <p>${message}</p>
+                `;
+                
+                chatContainer.appendChild(messageElement);
+                input.value = '';
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Simulate response after a delay
+                setTimeout(() => {
+                    const responses = [
+                        "Interesting. I'll look into that.",
+                        "Payment received. Sending data now.",
+                        "Access granted. Here are the credentials...",
+                        "The exploit works on version 2.4.7 and below.",
+                        "Meet me on the darknet for further discussion.",
+                        "The target has been compromised successfully."
+                    ];
+                    
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    const responseElement = document.createElement('div');
+                    responseElement.className = 'chat-message other mb-3 p-3 rounded';
+                    responseElement.innerHTML = `
+                        <div class="text-xs text-gray-400 mb-1">ANON_0x1F2E • ${timeString}</div>
+                        <p>${randomResponse}</p>
+                    `;
+                    
+                    chatContainer.appendChild(responseElement);
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }, 1000 + Math.random() * 2000);
+            }
+        }
+        
+        // Post functionality
+        document.getElementById('post-submit').addEventListener('click', createPost);
+        
+        function createPost() {
+            const textarea = document.getElementById('post-content');
+            const content = textarea.value.trim();
+            
+            if (content) {
+                const postsContainer = document.getElementById('posts-container');
+                const now = new Date();
+                const hoursAgo = (Math.random() * 5).toFixed(1);
+                
+                const postElement = document.createElement('div');
+                postElement.className = 'cyberpunk-border p-4 post';
+                postElement.innerHTML = `
+                    <div class="flex items-center mb-3">
+                        <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${Date.now()}" alt="User" class="w-10 h-10 rounded-full user-avatar mr-3">
+                        <div>
+                            <div class="font-bold pink-text">USER_0x7A3F</div>
+                            <div class="text-xs text-gray-400">${hoursAgo} HOURS AGO</div>
+                        </div>
+                    </div>
+                    <p class="mb-3">${content}</p>
+                    <div class="flex space-x-4 text-xs">
+                        <button class="flex items-center text-neon-blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                            </svg>
+                            0
+                        </button>
+                        <button class="flex items-center text-neon-purple">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            0
+                        </button>
+                        <button class="flex items-center text-neon-pink">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                            </svg>
+                            SAVE
+                        </button>
+                    </div>
+                `;
+                
+                // Add to top of posts
+                postsContainer.insertBefore(postElement, postsContainer.firstChild);
+                textarea.value = '';
+            }
+        }
+        
+        // Terminal-like welcome message
+        setTimeout(() => {
+            const welcomeElement = document.createElement('div');
+            welcomeElement.className = 'terminal-text text-sm blue-text mb-4';
+            welcomeElement.textContent = '> WELCOME TO NEONNET - YOUR CYBERPUNK HACKER COMMUNITY';
+            document.querySelector('header').appendChild(welcomeElement);
+        }, 1000);
+    </script>
+</body>
+</html>
